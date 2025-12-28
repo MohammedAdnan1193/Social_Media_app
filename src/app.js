@@ -98,12 +98,16 @@ const startServer = async () => {
     await connectDB();
     
     app.listen(PORT, () => {
+      // FIXED: Added fallback values and checks to prevent .padEnd() crashes
+      const envName = process.env.NODE_ENV || "production";
+      const dbName = process.env.DB_NAME || "Connected (URL)";
+      
       logger.info(`╔════════════════════════════════════════╗`);
-      logger.info(`║   Social Media API Server Started     ║`);
+      logger.info(`║   Social Media API Server Started      ║`);
       logger.info(`╠════════════════════════════════════════╣`);
       logger.info(`║ Port:        ${PORT.toString().padEnd(24)} ║`);
-      logger.info(`║ Environment: ${(process.env.NODE_ENV || "development").padEnd(24)} ║`);
-      logger.info(`║ Database:    ${process.env.DB_NAME.padEnd(24)} ║`);
+      logger.info(`║ Environment: ${envName.padEnd(24)} ║`);
+      logger.info(`║ Database:    ${dbName.padEnd(24)} ║`);
       logger.info(`╚════════════════════════════════════════╝`);
     });
   } catch (error) {
