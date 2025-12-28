@@ -1,0 +1,751 @@
+{
+  "info": {
+    "name": "Social Media API - Complete Test Suite",
+    "description": "Complete testing flow for Social Media Platform API including feed functionality",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "aliceToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "bobToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "charlieToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "aliceId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "bobId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "charlieId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "alicePost1",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "alicePost2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "bobPost1",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "bobPost2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "charliePost1",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "comment1",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "comment2",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Phase 1: Authentication",
+      "item": [
+        {
+          "name": "1.1 Register Alice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has token\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "    pm.collectionVariables.set('aliceToken', jsonData.token);",
+                  "    pm.collectionVariables.set('aliceId', jsonData.user.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"alice\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"password123\",\n  \"full_name\": \"Alice Smith\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "1.2 Register Bob (or Login if exists)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Check if registration succeeded",
+                  "if (pm.response.code === 201) {",
+                  "    pm.test(\"Bob registered successfully\", function () {",
+                  "        pm.response.to.have.status(201);",
+                  "    });",
+                  "    ",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('bobToken', jsonData.token);",
+                  "    pm.collectionVariables.set('bobId', jsonData.user.id);",
+                  "    console.log('✅ Bob registered - Token:', jsonData.token);",
+                  "    console.log('✅ Bob ID:', jsonData.user.id);",
+                  "}",
+                  "",
+                  "// If user already exists (409), login instead",
+                  "else if (pm.response.code === 409) {",
+                  "    pm.test(\"Bob already exists, will login next\", function () {",
+                  "        pm.response.to.have.status(409);",
+                  "    });",
+                  "    console.log('⚠️ Bob already exists, run login manually');",
+                  "    console.log('💡 Or delete Bob from database first');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"bob\",\n  \"email\": \"bob@example.com\",\n  \"password\": \"password123\",\n  \"full_name\": \"Bob Johnson\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "1.3 Register Charlie",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Charlie registered successfully\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('charlieToken', jsonData.token);",
+                  "pm.collectionVariables.set('charlieId', jsonData.user.id);",
+                  "console.log('Charlie Token:', jsonData.token);",
+                  "console.log('Charlie ID:', jsonData.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"charlie\",\n  \"email\": \"charlie@example.com\",\n  \"password\": \"password123\",\n  \"full_name\": \"Charlie Brown\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "1.4 Login Alice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Login successful\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"alice\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "1.5 Get Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Profile retrieved\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.user).to.have.property('follower_count');",
+                  "    pm.expect(jsonData.user).to.have.property('following_count');",
+                  "    pm.expect(jsonData.user).to.have.property('post_count');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{aliceToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/auth/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phase 2: Follow System",
+      "item": [
+        {
+          "name": "2.1 Alice Follows Bob",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Follow successful\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{aliceToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{bobId}}/follow",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{bobId}}", "follow"]
+            }
+          }
+        },
+        {
+          "name": "2.2 Bob Follows Alice",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{bobToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{aliceId}}/follow",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{aliceId}}", "follow"]
+            }
+          }
+        },
+        {
+          "name": "2.3 Get Alice's Followers",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{aliceToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/users/me/followers",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "followers"]
+            }
+          }
+        },
+        {
+          "name": "2.4 Get Alice's Following",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{aliceToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/users/me/following",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "following"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phase 3: Create Posts",
+      "item": [
+        {
+          "name": "3.1 Alice Creates Post 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('alicePost1', jsonData.post.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{aliceToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Hello everyone! This is Alice's first post. Excited to be here! 🎉\",\n  \"comments_enabled\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts"]
+            }
+          }
+        },
+        {
+          "name": "3.2 Alice Creates Post 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('alicePost2', jsonData.post.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{aliceToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Just finished an amazing book! Highly recommend it to everyone.\",\n  \"comments_enabled\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts"]
+            }
+          }
+        },
+        {
+          "name": "3.3 Bob Creates Post 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('bobPost1', jsonData.post.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{bobToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Good morning! Starting my day with a great workout 💪\",\n  \"comments_enabled\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts"]
+            }
+          }
+        },
+        {
+          "name": "3.4 Bob Creates Post 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('bobPost2', jsonData.post.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{bobToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Anyone else excited for the weekend?\",\n  \"comments_enabled\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts"]
+            }
+          }
+        },
+        {
+          "name": "3.5 Charlie Creates Post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('charliePost1', jsonData.post.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{charlieToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"This is a private thought. No comments please.\",\n  \"comments_enabled\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/posts",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phase 4: FEED TESTING (CRITICAL)",
+      "item": [
+        {
+          "name": "4.1 Alice's Feed (Own + Bob's)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Feed contains correct posts\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.posts).to.be.an('array');",
+                  "    pm.expect(jsonData.posts.length).to.be.at.least(4);",
+                  "    ",
+                  "    // Check each post has like_count and comment_count",
+                  "    jsonData.posts.forEach(function(post) {",
+                  "        pm.expect(post).to.have.property('like_count');",
+                  "        pm.expect(post).to.have.property('comment_count');",
+                  "        pm.expect(post).to.have.property('username');",
+                  "        pm.expect(post).to.have.property('full_name');",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{aliceToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/posts/feed",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "feed"]
+            }
+          }
+        },
+        {
+          "name": "4.2 Bob's Feed (Own + Alice's)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{bobToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/posts/feed",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "feed"]
+            }
+          }
+        },
+        {
+          "name": "4.3 Charlie's Feed (Only Own)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Charlie only sees own post\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.posts.length).to.equal(1);",
+                  "    pm.expect(jsonData.posts[0].user_id).to.equal(parseInt(pm.collectionVariables.get('charlieId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{charlieToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/posts/feed",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "feed"]
+            }
+          }
+        },
+        {
+          "name": "4.4 Feed with Pagination",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{aliceToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/posts/feed?page=1&limit=2",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "feed"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "2"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phase 5: Likes",
+      "item": [
+        {
+          "name": "5.1 Bob Likes Alice's Post",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{bobToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/likes/{{alicePost1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["likes", "{{alicePost1}}"]
+            }
+          }
+        },
+        {
+          "name": "5.2 Charlie Likes Alice's Post",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{charlieToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/likes/{{alicePost1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["likes", "{{alicePost1}}"]
+            }
+          }
+        },
+        {
+          "name": "5.3 Get Likes for Post",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/likes/{{alicePost1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["likes", "{{alicePost1}}"]
+            }
+          }
+        },
+        {
+          "name": "5.4 Unlike Post",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{bobToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/likes/{{alicePost1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["likes", "{{alicePost1}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phase 6: Comments",
+      "item": [
+        {
+          "name": "6.1 Bob Comments on Alice's Post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('comment1', jsonData.comment.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{bobToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Great post Alice! Really inspiring 👍\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/comments/{{alicePost1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "{{alicePost1}}"]
+            }
+          }
+        },
+        {
+          "name": "6.2 Charlie Comments on Alice's Post",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('comment2', jsonData.comment.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{charlieToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"I totally agree with this!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/comments/{{alicePost1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "{{alicePost1}}"]
+            }
+          }
+        },
+        {
+          "name": "6.3 Get Comments for Post",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/comments/post/{{alicePost1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "post", "{{alicePost1}}"]
+            }
+          }
+        },
+        {
+          "name": "6.4 Delete Comment",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{bobToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/comments/{{comment1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["comments", "{{comment1}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Phase 7: Feed with Updated Counts",
+      "item": [
+        {
+          "name": "7.1 Alice's Feed Shows Counts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Feed shows updated like and comment counts\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var alicePost = jsonData.posts.find(p => p.id == pm.collectionVariables.get('alicePost1'));",
+                  "    ",
+                  "    if (alicePost) {",
+                  "        pm.expect(alicePost.like_count).to.be.a('number');",
+                  "        pm.expect(alicePost.comment_count).to.be.a('number');",
+                  "        console.log('Alice Post 1 - Likes:', alicePost.like_count, 'Comments:', alicePost.comment_count);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{aliceToken}}"}],
+            "url": {
+              "raw": "{{baseUrl}}/posts/feed",
+              "host": ["{{baseUrl}}"],
+              "path": ["posts", "feed"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
